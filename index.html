@@ -257,40 +257,43 @@
         }
 
         // Send message to backend
-        async function sendMessage() {
-            const question = userInput.value.trim();
-            if (!question) return;
 
-            // Add user message
-            addMessage(question, true);
-            userInput.value = '';
-            
-            // Show typing indicator
-            showTyping();
+async function sendMessage() {
+  const question = userInput.value.trim();
+  if (!question) return;
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ question: question })
-                });
+  addMessage(question, true);
+  userInput.value = '';
+  showTyping();
 
-                const data = await response.json();
-                hideTyping();
-                
-                if (data.answer) {
-                    addMessage(data.answer);
-                } else {
-                    addMessage("Maaf, terjadi kesalahan. Silakan coba lagi.");
-                }
-            } catch (error) {
-                hideTyping();
-                addMessage("Maaf, sedang ada gangguan koneksi. Silakan refresh halaman dan coba lagi.");
-                console.error('Error:', error);
-            }
-        }
+  try {
+    // GET REQUEST - sudah terbukti work!
+    const url = SCRIPT_URL + '?question=' + encodeURIComponent(question);
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    hideTyping();
+    
+    if (data.answer) {
+      addMessage(data.answer);
+    } else {
+      addMessage("Maaf, tidak ada jawaban untuk pertanyaan tersebut.");
+    }
+    
+  } catch (error) {
+    hideTyping();
+    addMessage("Maaf, sedang ada gangguan koneksi. Silakan coba lagi.");
+  }
+}
+
+    // Fallback message
+    addMessage("🤖 Fitur AI sedang dalam perbaikan. Untuk sementara, berikut info penting:\n\n" +
+               "📞 Kontak Sekolah: (0274) 123456\n" +
+               "🌐 Website: www.smatakhassus.sch.id\n" +
+               "📍 Alamat: Jl. Pendidikan No. 123, Yogyakarta");
+  }
+}
 
         // Event listeners
         sendButton.addEventListener('click', sendMessage);
