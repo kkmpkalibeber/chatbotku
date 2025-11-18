@@ -221,7 +221,8 @@
         </div>
     </div>
 
-    <script>
+  
+        <script>
         // Configuration
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbMfrlEmQT1Dha4zMKBEw1CoOA8qzQynRp1GEEtXoWYbphXMr5mh1wCsGfVD2uN2NE0g/exec';
 
@@ -257,43 +258,31 @@
         }
 
         // Send message to backend
+        async function sendMessage() {
+            const question = userInput.value.trim();
+            if (!question) return;
 
-async function sendMessage() {
-  const question = userInput.value.trim();
-  if (!question) return;
+            addMessage(question, true);
+            userInput.value = '';
+            showTyping();
 
-  addMessage(question, true);
-  userInput.value = '';
-  showTyping();
-
-  try {
-    // GET REQUEST - sudah terbukti work!
-    const url = SCRIPT_URL + '?question=' + encodeURIComponent(question);
-    
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    hideTyping();
-    
-    if (data.answer) {
-      addMessage(data.answer);
-    } else {
-      addMessage("Maaf, tidak ada jawaban untuk pertanyaan tersebut.");
-    }
-    
-  } catch (error) {
-    hideTyping();
-    addMessage("Maaf, sedang ada gangguan koneksi. Silakan coba lagi.");
-  }
-}
-
-    // Fallback message
-    addMessage("🤖 Fitur AI sedang dalam perbaikan. Untuk sementara, berikut info penting:\n\n" +
-               "📞 Kontak Sekolah: (0274) 123456\n" +
-               "🌐 Website: www.smatakhassus.sch.id\n" +
-               "📍 Alamat: Jl. Pendidikan No. 123, Yogyakarta");
-  }
-}
+            try {
+                const url = SCRIPT_URL + '?question=' + encodeURIComponent(question);
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                hideTyping();
+                
+                if (data.answer) {
+                    addMessage(data.answer);
+                } else {
+                    addMessage("Maaf, tidak ada jawaban untuk pertanyaan tersebut.");
+                }
+            } catch (error) {
+                hideTyping();
+                addMessage("Maaf, sedang ada gangguan koneksi. Silakan coba lagi.");
+            }
+        }
 
         // Event listeners
         sendButton.addEventListener('click', sendMessage);
@@ -308,4 +297,5 @@ async function sendMessage() {
     </script>
 </body>
 </html>
+
 
